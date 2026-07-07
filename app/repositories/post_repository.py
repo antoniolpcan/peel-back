@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.post import PostIt
-from app.schemas.post import PostItCreate
+from app.schemas.post import PostItCreate, PostItUpdate
 
 class PostItRepository:
     def __init__(self, db: Session):
@@ -19,9 +19,24 @@ class PostItRepository:
         self.db.refresh(db_obj)
         return db_obj
 
-    def delete(self, db_obj: PostIt) -> None:
-        self.db.delete(db_obj)
+    def update(self, db_obj: PostIt, obj_in: PostItUpdate) -> PostIt:
+        update_data = obj_in.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
+        
+        self.db.add(db_obj)
         self.db.commit()
-
+        self.db.refresh(db_obj)
+        return db_obj
+        
+    def delete(self, db_obj: PostIt) -> bool:
+        try:
+            self.db.delete(db_obj)
+            self.db.commit()
+            return True
+        except Exception:
+            self.db.rollback()
+            return False
+        
     def save(self) -> None:
         self.db.commit()

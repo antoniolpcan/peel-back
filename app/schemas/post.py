@@ -7,6 +7,11 @@ class PostItBase(BaseModel):
     body: str
     color_id: Optional[int] = None
 
+class PostItUpdate(BaseModel):
+    title: Optional[str] = None
+    body: Optional[str] = None
+    color_id: Optional[int] = None
+
 class PostItCreate(PostItBase):
     user_id: int
 

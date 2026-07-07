@@ -19,7 +19,7 @@ def get_db() -> Generator:
         db.close()
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_V1_STR}/auth/login"
+    tokenUrl=f"{settings.API_V1_STR}/auth"
 )
 
 def get_current_user(
@@ -35,8 +35,8 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Não foi possível validar as credenciais",
         )
-    
-    user = UserRepository().get_by_id(db, user_id=int(user_id))
+    user = UserRepository(db)
+    user.get_by_id(user_id=int(user_id))
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     return user
