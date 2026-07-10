@@ -1,15 +1,22 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from app.repositories.user_repository import UserRepository
 from app.core.security import verify_password, create_access_token
+import asyncio
 
 class AuthService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.user_repo = UserRepository(db)
 
-    def acess_auth(self, form_data):
-        user = self.user_repo.get_by_email(email=form_data.username)
-        if not user or not verify_password(form_data.password, user.hashed_password):
+    async def acess_auth(self, form_data):
+        user = await self.user_repo.get_by_email(email=form_data.username)
+        if user:
+            is_password_valid = await asyncio.to_thread(
+                verify_password, form_data.password, user.hashed_password
+            )
+        else:
+            is_password_valid = False
+        if not user or not is_password_valid:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Email ou senha incorretos",
