@@ -41,7 +41,7 @@ Para rodar o back-end localmente na sua máquina, siga os passos abaixo:
     pip install -r requirements.txt
 
     # Inicialize o servidor de desenvolvimento do FastAPI:
-    uvicorn main:app --reload
+    uvicorn app.main:app --reload
 ```
 
 A API estará disponível por padrão em http://127.0.0.1:8000 e a documentação interativa automática (Swagger UI) em http://127.0.0.1:8000/docs.

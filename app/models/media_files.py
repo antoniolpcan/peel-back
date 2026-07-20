@@ -17,3 +17,12 @@ class MediaFile(Base):
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     
     user: Mapped["User"] = relationship(back_populates="media_files", foreign_keys=[user_id])
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "filename": self.filename,
+            "url": self.url,
+            "user_id": self.user_id,
+            "created_at": self.created_at.isoformat()
+        }
