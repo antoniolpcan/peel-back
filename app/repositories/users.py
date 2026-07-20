@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
+from app.models.users import User
+from app.schemas.user import UserCreate, UserBase
 from app.core.security import get_password_hash
 import asyncio
 
@@ -31,7 +31,7 @@ class UserRepository:
         await self.db.refresh(db_user)
         return db_user
 
-    async def update(self, db_user: User, user_in: UserUpdate) -> User:
+    async def update(self, db_user: User, user_in: UserBase) -> User:
         update_data = user_in.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_user, field, value)

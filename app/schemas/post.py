@@ -1,25 +1,25 @@
-from pydantic import BaseModel, ConfigDict
-from datetime import datetime
+from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
-class PostItBase(BaseModel):
+class PostBase(BaseModel):
     title: str
     body: str
     color_id: Optional[int] = None
 
-class PostItUpdate(BaseModel):
+class PostCreate(PostBase):
+    pass
+
+class PostUpdate(BaseModel):
     title: Optional[str] = None
     body: Optional[str] = None
     color_id: Optional[int] = None
 
-class PostItCreate(PostItBase):
-    user_id: int
-
-class PostItResponse(PostItBase):
+class PostResponse(PostBase):
     id: int
     user_id: int
-    created_at: datetime
-    likes: int
-    has_liked: bool
+    likes: int = 0
+    created_at: Optional[datetime]
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        from_attributes = True

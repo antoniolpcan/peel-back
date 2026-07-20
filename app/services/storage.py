@@ -3,7 +3,7 @@ import cloudinary.uploader
 from PIL import Image
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.repositories.media_repository import MediaRepository
+from app.repositories.media import MediaRepository
 from app.core.config import settings
 import io
 import os

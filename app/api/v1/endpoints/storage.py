@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException
-from app.services.storage_service import StorageService
+from app.services.storage import StorageService
 from app.api.deps import get_storage_service, get_current_user 
-from app.models.user import User
+from app.models.users import User
 
 router = APIRouter()
 

@@ -1,32 +1,35 @@
 from fastapi import APIRouter, Depends, status
 from typing import List
 
-from app.api.deps import get_user_service
+from app.api.deps import get_user_service, get_current_user 
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
-from app.services.user_service import UserService
+from app.services.users import UserService
+from app.models.users import User
 
 router = APIRouter()
 
 @router.post("", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def create_user(
-        user_in: UserCreate, 
-        service: UserService = Depends(get_user_service)
-    ):
-    return await service.create_user(user_in)
+async def create_user(payload: UserCreate, service: UserService = Depends(get_user_service)):
+    return await service.create_user(payload)
 
 @router.get("", response_model=List[UserResponse])
 async def read_users(skip: int = 0, limit: int = 100, service: UserService = Depends(get_user_service)):
     return await service.get_users(skip=skip, limit=limit)
 
 @router.get("/{user_id}", response_model=UserResponse)
-async def read_user(user_id: int, service: UserService = Depends(get_user_service)):
+async def get_user_profile(user_id: int, service: UserService = Depends(get_user_service)):
     return await service.get_user(user_id)
 
-@router.patch("/{user_id}", response_model=UserResponse)
-async def update_user(user_id: int, user_in: UserUpdate, service: UserService = Depends(get_user_service)):
-    return await service.update_user(user_id, user_in)
+@router.patch("/me", response_model=UserResponse)
+async def update_current_user(payload: UserUpdate, service: UserService = Depends(get_user_service),
+                        current_user: User = Depends(get_current_user)):
+    return await service.update_user(user_id=current_user.id, user_in=payload)
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: int, service: UserService = Depends(get_user_service)):
-    await service.delete_user(user_id)
-    return None
+    return await service.delete_user(user_id)
+
+@router.post("/{user_id}/follow", status_code=status.HTTP_200_OK)
+async def toggle_follow(user_id: int, service: UserService = Depends(get_user_service),
+                        current_user: User = Depends(get_current_user)):
+    return await service.toggle_user_follow(follower_id=current_user.id, following_id=user_id)

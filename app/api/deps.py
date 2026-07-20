@@ -6,16 +6,17 @@ from pydantic import ValidationError
 
 from app.core.security import SECRET_KEY, ALGORITHM
 from app.core.config import settings
-from app.models.user import User
-from app.repositories.user_repository import UserRepository
+from app.models.users import User
+from app.repositories.users import UserRepository
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.auth_service import AuthService
-from app.services.user_service import UserService
-from app.services.storage_service import StorageService
-from app.services.post_service import PostItService
-from app.services.post_color_service import ColorService
+from app.services.auth import AuthService
+from app.services.users import UserService
+from app.services.storage import StorageService
+from app.services.posts import PostService
+from app.services.colors import ColorService
+from app.services.comments import CommentService
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as db:
@@ -53,8 +54,11 @@ def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
 def get_storage_service(db: AsyncSession = Depends(get_db)) -> StorageService:
     return StorageService(db)
 
-def get_post_service(db: AsyncSession = Depends(get_db)) -> PostItService:
-    return PostItService(db)
+def get_post_service(db: AsyncSession = Depends(get_db)) -> PostService:
+    return PostService(db)
 
 def get_color_service(db: AsyncSession = Depends(get_db)) -> ColorService:
     return ColorService(db)
+
+def get_comment_service(db: AsyncSession = Depends(get_db)) -> CommentService:
+    return CommentService(db)
