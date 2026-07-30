@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from typing import List
 from app.api.deps import get_post_service, get_comment_service, get_current_user 
-from app.schemas.post import PostBase, PostResponse, PostUpdate
+from app.schemas.post import PostBase, PostResponse, PostUpdate, PostQueryParams
 from app.schemas.comments import CommentCreate, CommentResponse
 from app.services.posts import PostService
 from app.services.comments import CommentService
@@ -20,8 +20,8 @@ async def get_post(post_id: int, service: PostService = Depends(get_post_service
     return await service.get_post_by_id(post_id)
 
 @router.get("", response_model=List[PostResponse])
-async def list_posts(skip: int = 0, limit: int = 100, service: PostService = Depends(get_post_service)):
-    return await service.search_posts(skip=skip, limit=limit)
+async def search_posts(params: PostQueryParams = Depends(), service: PostService = Depends(get_post_service)):
+    return await service.search_posts(params)
 
 @router.post("/{post_id}", response_model=PostResponse)
 async def update_post(

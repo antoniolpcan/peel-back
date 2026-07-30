@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from app.repositories.posts import PostRepository
 from app.repositories.post_likes import PostLikeRepository
-from app.schemas.post import PostUpdate, PostCreate
+from app.schemas.post import PostUpdate, PostCreate, PostQueryParams
 from app.models.posts import Post
 
 class PostService:
@@ -22,8 +22,8 @@ class PostService:
             )
         return post
 
-    async def search_posts(self, skip: int, limit: int) -> list[Post]:
-        return await self.post_repo.get_multi(skip=skip, limit=limit)
+    async def search_posts(self, params: PostQueryParams) -> list[Post]:
+        return await self.post_repo.search(**vars(params))
     
     async def update_post(self, post_id: int, post_in: PostUpdate, user_id: int) -> Post:
         post = await self.get_post_by_id(post_id)

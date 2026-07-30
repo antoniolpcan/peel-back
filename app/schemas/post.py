@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from app.schemas.enums import PostSortField, SortOrder
 
 class PostBase(BaseModel):
     title: str
@@ -23,3 +24,22 @@ class PostResponse(PostBase):
 
     class Config:
         from_attributes = True
+
+class PostQueryParams:
+    def __init__(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        title: Optional[str] = None,
+        body: Optional[str] = None,
+        user_id: Optional[int] = None,
+        order_by: PostSortField = PostSortField.created_at,
+        sort_order: SortOrder = SortOrder.desc
+    ):
+        self.skip = skip
+        self.limit = limit
+        self.title = title
+        self.body = body
+        self.user_id = user_id
+        self.order_by = order_by
+        self.sort_order = sort_order
