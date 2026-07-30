@@ -24,7 +24,3 @@ async def get_user_profile(user_id: int, service: UserService = Depends(get_user
 async def update_current_user(payload: UserUpdate, service: UserService = Depends(get_user_service),
                         current_user: User = Depends(get_current_user)):
     return await service.update_user(user_id=current_user.id, user_in=payload)
-
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, service: UserService = Depends(get_user_service)):
-    return await service.delete_user(user_id)
