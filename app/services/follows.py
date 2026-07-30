@@ -44,3 +44,6 @@ class FollowService:
 
     async def get_following(self, user_id: int) -> list[Follow]:
         return await self.follower_repo.get_following(user_id)
+
+    async def get_follow_stats(self, user_id: int) -> list[Follow]:
+        return await self.follower_repo.get_follow_stats(user_id)

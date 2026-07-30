@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy import func
 
 from app.models.follows import Follow
 
@@ -46,3 +47,14 @@ class FollowRepository:
 
     async def delete(self, follow: Follow) -> None:
         await self.db.delete(follow)
+
+    async def get_follow_stats(self, user_id: int) -> dict:
+        followers_query = select(func.count()).select_from(Follow).where(Follow.following_id == user_id)
+        following_query = select(func.count()).select_from(Follow).where(Follow.follower_id == user_id)
+        followers_result = await self.db.execute(followers_query)
+        following_result = await self.db.execute(following_query)
+        
+        return {
+            "followers_count": followers_result.scalar() or 0,
+            "following_count": following_result.scalar() or 0
+        }

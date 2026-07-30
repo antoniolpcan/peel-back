@@ -28,3 +28,7 @@ class FollowingResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class FollowStatsResponse(BaseModel):
+    followers_count: int
+    following_count: int
