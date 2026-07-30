@@ -1,12 +1,13 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
+from app.schemas.media_files import MediaFileBase
 
 class BasicUserResponse(BaseModel):
     name: str
     username: Optional[str] = None
     bio: Optional[str] = None
-    avatar_id: Optional[int] = None
+    avatar: Optional[MediaFileBase] = None
     created_at: Optional[datetime]
 
 class UserBase(BaseModel):
@@ -21,9 +22,9 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
-    avatar_id: Optional[int] = None
+    avatar: Optional[MediaFileBase] = None
     created_at: Optional[datetime]
-
+    
     class Config:
         from_attributes = True
 

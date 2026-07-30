@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from app.models.users import User
 from app.schemas.user import UserCreate, UserBase
 from app.core.security import get_password_hash
@@ -11,13 +12,16 @@ class UserRepository:
         self.db = db
 
     async def get_by_id(self, user_id: int) -> User | None:
-        return await self.db.scalar(select(User).where(User.id == user_id))
+        stmt = select(User).options(selectinload(User.avatar)).where(User.id == user_id)
+        return await self.db.scalar(stmt)
 
     async def get_by_email(self, email: str) -> User | None:
-        return await self.db.scalar(select(User).where(User.email == email))
+        stmt = select(User).options(selectinload(User.avatar)).where(User.email == email)
+        return await self.db.scalar(stmt)
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> list[User]:
-        result = await self.db.scalars(select(User).offset(skip).limit(limit))
+        stmt = select(User).options(selectinload(User.avatar)).offset(skip).limit(limit)
+        result = await self.db.scalars(stmt)
         return list(result.all())
 
     async def create(self, user_in: UserCreate) -> User:
@@ -29,7 +33,7 @@ class UserRepository:
         self.db.add(db_user)
         await self.db.commit()
         await self.db.refresh(db_user)
-        return db_user
+        return await self.get_by_id(db_user.id)
 
     async def update(self, db_user: User, user_in: UserBase) -> User:
         update_data = user_in.model_dump(exclude_unset=True)
@@ -39,7 +43,7 @@ class UserRepository:
         self.db.add(db_user)
         await self.db.commit()
         await self.db.refresh(db_user)
-        return db_user
+        return await self.get_by_id(db_user.id)
 
     async def delete(self, db_user: User) -> None:
         await self.db.delete(db_user)

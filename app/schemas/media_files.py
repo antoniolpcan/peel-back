@@ -1,9 +1,9 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 from datetime import datetime
 
 class MediaFileBase(BaseModel):
-    filename: str
     url: str
+    filename: str
 
 class MediaFileCreate(MediaFileBase):
     pass

@@ -1,38 +1,71 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.posts import Post
 from app.schemas.post import PostUpdate
 from app.schemas.enums import PostSortField, SortOrder
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
+from app.models.posts import Post
+from app.models.users import User
+from app.models.follows import Follow
 
 class PostRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def get_by_id(self, post_id: int) -> Post | None:
-        return await self.db.scalar(select(Post).where(Post.id == post_id))
+        stmt = (
+            select(Post)
+            .options(
+                selectinload(Post.color),
+                selectinload(Post.user).selectinload(User.avatar)
+            )
+            .where(Post.id == post_id)
+        )
+        return await self.db.scalar(stmt)
 
     async def get_multi(self, skip: int = 0, limit: int = 100) -> list[Post]:
-        result = await self.db.scalars(select(Post).offset(skip).limit(limit))
+        stmt = (
+            select(Post)
+            .options(
+                selectinload(Post.color),
+                selectinload(Post.user).selectinload(User.avatar)
+            )
+            .offset(skip)
+            .limit(limit)
+        )
+        result = await self.db.scalars(stmt)
         return list(result.all())
     
     async def search(
         self, 
-        skip: int = 0, 
-        limit: int = 100, 
+        skip: int = 0,
+        limit: int = 100,
         title: str | None = None,
         body: str | None = None,
         user_id: int | None = None,
+        following_for_user_id: int | None = None,
         order_by: PostSortField = PostSortField.created_at,
         sort_order: SortOrder = SortOrder.desc
     ) -> list[Post]:
         
-        stmt = select(Post)
+        stmt = select(Post).options(
+            selectinload(Post.color),
+            selectinload(Post.user).selectinload(User.avatar)
+        )
+        
         if title:
             stmt = stmt.where(Post.title.ilike(f"%{title}%")) 
         if body:
             stmt = stmt.where(Post.body.ilike(f"%{body}%")) 
         if user_id:
             stmt = stmt.where(Post.user_id == user_id)
+
+        if following_for_user_id:
+            following_subquery = (
+                select(Follow.following_id)
+                .where(Follow.follower_id == following_for_user_id)
+            )
+            stmt = stmt.where(Post.user_id.in_(following_subquery))
 
         sort_column = getattr(Post, order_by.value)
         if sort_order == SortOrder.desc:

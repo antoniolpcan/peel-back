@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from app.core.database import engine, Base
 from app.api.v1.api import api_router, limiter
 from app.core.config import settings
+from app.core.seed import seed_colors
 
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -13,6 +14,7 @@ from slowapi.errors import RateLimitExceeded
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await seed_colors()
     yield
 
 app = FastAPI(

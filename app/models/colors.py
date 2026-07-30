@@ -10,5 +10,6 @@ class Color(Base):
     __tablename__ = "colors"
     id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
     name: Mapped[str] = mapped_column(String(80), nullable=False, unique=True)
+    hex_code: Mapped[str] = mapped_column(String(7), nullable=False)
     
     posts: Mapped[list["Post"]] = relationship(back_populates="color")

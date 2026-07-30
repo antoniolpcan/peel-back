@@ -28,6 +28,7 @@ class User(Base):
     comments: Mapped[List["Comment"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     likes: Mapped[List["PostLike"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
+    avatar: Mapped[Optional["MediaFile"]] = relationship("MediaFile", foreign_keys=[avatar_id])
     media_files: Mapped[List["MediaFile"]] = relationship(back_populates="user", foreign_keys="[MediaFile.user_id]", cascade="all, delete-orphan")
     followers: Mapped[List["Follow"]] = relationship(back_populates="following", foreign_keys="[Follow.following_id]", cascade="all, delete-orphan")
     following: Mapped[List["Follow"]] = relationship(back_populates="follower", foreign_keys="[Follow.follower_id]", cascade="all, delete-orphan")

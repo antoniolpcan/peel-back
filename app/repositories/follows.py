@@ -4,6 +4,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import func
 
 from app.models.follows import Follow
+from app.models.users import User
 
 class FollowRepository:
     def __init__(self, db_session: AsyncSession):
@@ -21,7 +22,7 @@ class FollowRepository:
         query = (
             select(Follow)
             .options(
-                selectinload(Follow.follower)
+                selectinload(Follow.follower).selectinload(User.avatar)
             )
             .where(Follow.following_id == user_id)
         )
@@ -29,11 +30,10 @@ class FollowRepository:
         return result.scalars().unique().all()
 
     async def get_following(self, user_id: int) -> list[Follow]:
-        """Traz todas as pessoas que user_id segue, trazendo os dados de quem é seguido (following)"""
         query = (
             select(Follow)
             .options(
-                selectinload(Follow.following)
+                selectinload(Follow.following).selectinload(User.avatar)
             )
             .where(Follow.follower_id == user_id)
         )

@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 from app.schemas.enums import PostSortField, SortOrder
+from app.schemas.color import ColorResponse
+from app.schemas.user import BasicUserResponse
 
 class PostBase(BaseModel):
     title: str
@@ -21,6 +23,8 @@ class PostResponse(PostBase):
     user_id: int
     likes: int = 0
     created_at: Optional[datetime]
+    color: Optional[ColorResponse] = None
+    user: BasicUserResponse
 
     class Config:
         from_attributes = True
@@ -33,6 +37,7 @@ class PostQueryParams:
         title: Optional[str] = None,
         body: Optional[str] = None,
         user_id: Optional[int] = None,
+        following_for_user_id: Optional[int] = None,
         order_by: PostSortField = PostSortField.created_at,
         sort_order: SortOrder = SortOrder.desc
     ):
@@ -41,5 +46,6 @@ class PostQueryParams:
         self.title = title
         self.body = body
         self.user_id = user_id
+        self.following_for_user_id = following_for_user_id
         self.order_by = order_by
         self.sort_order = sort_order

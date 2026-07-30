@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
-from app.repositories.follows import FollowRepository
 from app.repositories.users import UserRepository
 from app.schemas.user import UserCreate, UserUpdate
 from app.models.users import User
