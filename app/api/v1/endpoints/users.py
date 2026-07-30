@@ -28,8 +28,3 @@ async def update_current_user(payload: UserUpdate, service: UserService = Depend
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: int, service: UserService = Depends(get_user_service)):
     return await service.delete_user(user_id)
-
-@router.post("/{user_id}/follow", status_code=status.HTTP_200_OK)
-async def toggle_follow(user_id: int, service: UserService = Depends(get_user_service),
-                        current_user: User = Depends(get_current_user)):
-    return await service.toggle_user_follow(follower_id=current_user.id, following_id=user_id)

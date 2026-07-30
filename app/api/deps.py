@@ -17,6 +17,7 @@ from app.services.storage import StorageService
 from app.services.posts import PostService
 from app.services.colors import ColorService
 from app.services.comments import CommentService
+from app.services.follows import FollowService
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as db:
@@ -62,3 +63,6 @@ def get_color_service(db: AsyncSession = Depends(get_db)) -> ColorService:
 
 def get_comment_service(db: AsyncSession = Depends(get_db)) -> CommentService:
     return CommentService(db)
+
+def get_follow_service(db: AsyncSession = Depends(get_db)) -> FollowService:
+    return FollowService(db)
