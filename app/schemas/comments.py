@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from app.schemas.user import BasicUserResponse
 
@@ -14,6 +14,4 @@ class CommentResponse(CommentBase):
     user_id: int
     user: BasicUserResponse
     created_at: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

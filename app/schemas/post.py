@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 from app.schemas.enums import PostSortField, SortOrder
@@ -25,9 +25,7 @@ class PostResponse(PostBase):
     created_at: Optional[datetime]
     color: Optional[ColorResponse] = None
     user: BasicUserResponse
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PostQueryParams:
     def __init__(

@@ -46,5 +46,21 @@ Para rodar o back-end localmente na sua máquina, siga os passos abaixo:
 
 A API estará disponível por padrão em http://127.0.0.1:8000 e a documentação interativa automática (Swagger UI) em http://127.0.0.1:8000/docs.
 
+## 🧪 Executando os Testes
+
+Os testes assíncronos da aplicação foram desenvolvidos utilizando **pytest** e **HTTPX**.
+
+```cmd
+# Executar todos os testes:
+pytest
+
+# Executar com saída detalhada e sem os logs de SQL no terminal:
+pytest -v --log-level=WARNING
+
+# Gerar o relatório de cobertura de código (Coverage):
+pytest --cov=app --cov-report=html
+```
+O relatório interativo em HTML será gerado na pasta htmlcov/. Para visualizá-lo, abra o arquivo htmlcov/index.html em seu navegador.
+
 ---
 Desenvolvido por [Antonio Candioto](https://github.com/antoniolpcan) — Entre em contato no [LinkedIn](https://www.linkedin.com/in/antoniolpcan/)

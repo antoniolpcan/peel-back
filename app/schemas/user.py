@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
 from datetime import datetime
 from app.schemas.media_files import MediaFileBase
@@ -24,9 +24,7 @@ class UserResponse(UserBase):
     id: int
     avatar: Optional[MediaFileBase] = None
     created_at: Optional[datetime]
-    
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None
