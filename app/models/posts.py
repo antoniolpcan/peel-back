@@ -24,5 +24,5 @@ class Post(Base):
     user: Mapped["User"] = relationship(back_populates="posts")
     color: Mapped[Optional["Color"]] = relationship(back_populates="posts")
     
-    comments: Mapped[List["Comment"]] = relationship(back_populates="post", cascade="all, delete-orphan")
-    post_likes: Mapped[List["PostLike"]] = relationship(back_populates="post", cascade="all, delete-orphan")
+    comments: Mapped[List["Comment"]] = relationship(back_populates="post", cascade="all, delete-orphan", passive_deletes=True)
+    post_likes: Mapped[List["PostLike"]] = relationship(back_populates="post", cascade="all, delete-orphan", passive_deletes=True)

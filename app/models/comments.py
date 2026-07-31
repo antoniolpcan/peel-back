@@ -12,8 +12,8 @@ class Comment(Base):
     __tablename__ = "comments"
     
     id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
-    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     content: Mapped[str] = mapped_column(String(500), nullable=False)
     created_at: Mapped[Optional[datetime]] = mapped_column(default=func.now(), nullable=False)
     
