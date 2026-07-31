@@ -86,6 +86,8 @@ class PostRepository:
         self.db.add(db_obj)
         await self.db.commit()
         await self.db.refresh(db_obj)
+
+        await self.db.refresh(db_obj, attribute_names=["color"])
         return db_obj
 
     async def update(self, db_obj: Post, post_in: PostUpdate) -> Post:
