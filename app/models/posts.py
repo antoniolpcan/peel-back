@@ -16,7 +16,7 @@ class Post(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
     body: Mapped[str] = mapped_column(String(1000), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     color_id: Mapped[Optional[int]] = mapped_column(ForeignKey("colors.id"), nullable=True)
     likes: Mapped[int] = mapped_column(default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)

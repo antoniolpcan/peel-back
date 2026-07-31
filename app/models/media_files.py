@@ -13,7 +13,7 @@ class MediaFile(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
     filename: Mapped[str] = mapped_column(String(255), nullable=False)
     url: Mapped[str] = mapped_column(String(500), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     
     user: Mapped["User"] = relationship(back_populates="media_files", foreign_keys=[user_id])

@@ -24,11 +24,11 @@ class User(Base):
     avatar_id: Mapped[Optional[int]] = mapped_column(ForeignKey("media_files.id"), nullable=True)
     created_at: Mapped[Optional[datetime]] = mapped_column(default=func.now(), nullable=False)
     
-    posts: Mapped[List["Post"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    comments: Mapped[List["Comment"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    likes: Mapped[List["PostLike"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    posts: Mapped[List["Post"]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
+    comments: Mapped[List["Comment"]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
+    likes: Mapped[List["PostLike"]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
 
     avatar: Mapped[Optional["MediaFile"]] = relationship("MediaFile", foreign_keys=[avatar_id])
-    media_files: Mapped[List["MediaFile"]] = relationship(back_populates="user", foreign_keys="[MediaFile.user_id]", cascade="all, delete-orphan")
-    followers: Mapped[List["Follow"]] = relationship(back_populates="following", foreign_keys="[Follow.following_id]", cascade="all, delete-orphan")
-    following: Mapped[List["Follow"]] = relationship(back_populates="follower", foreign_keys="[Follow.follower_id]", cascade="all, delete-orphan")
+    media_files: Mapped[List["MediaFile"]] = relationship(back_populates="user", foreign_keys="[MediaFile.user_id]", cascade="all, delete-orphan", passive_deletes=True)
+    followers: Mapped[List["Follow"]] = relationship(back_populates="following", foreign_keys="[Follow.following_id]", cascade="all, delete-orphan", passive_deletes=True)
+    following: Mapped[List["Follow"]] = relationship(back_populates="follower", foreign_keys="[Follow.follower_id]", cascade="all, delete-orphan", passive_deletes=True)

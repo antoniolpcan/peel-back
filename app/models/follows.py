@@ -11,8 +11,8 @@ class Follow(Base):
     __tablename__ = "follows"
     
     id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
-    follower_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    following_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    follower_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    following_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     
     follower: Mapped["User"] = relationship(back_populates="followers", foreign_keys=[follower_id])
