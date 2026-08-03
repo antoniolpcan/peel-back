@@ -3,25 +3,28 @@ from app.core.database import SessionLocal
 from app.models.colors import Color 
 
 DEFAULT_COLORS = [
-    {"name": "yellow", "hex_code": "#FEF9C3"},
-    {"name": "blue", "hex_code": "#E0F2FE"},
-    {"name": "green", "hex_code": "#DCFCE7"},
-    {"name": "pink", "hex_code": "#FCE7F3"},
-    {"name": "purple", "hex_code": "#F3E8FF"},
-    {"name": "peach", "hex_code": "#FFEDD5"},
-    {"name": "gray", "hex_code": "#E2E4E9"},
+    {"name": "yellow", "hex_code": "#FEF08A"},
+    {"name": "pink",   "hex_code": "#FBCFE8"},
+    {"name": "blue",   "hex_code": "#BAE6FD"},
+    {"name": "green",  "hex_code": "#BBF7D0"},
+    {"name": "purple", "hex_code": "#E9D5FF"},
+    {"name": "orange", "hex_code": "#FED7AA"},
 ]
 
 async def seed_colors():
     async with SessionLocal() as db:
         try:
             result = await db.execute(select(Color))
-            existing_colors = result.scalars().all()
-            if len(existing_colors) == 0:
-                for color_data in DEFAULT_COLORS:
-                    db_color = Color(name=color_data["name"], hex_code=color_data["hex_code"])
+            existing_colors = {color.name: color for color in result.scalars().all()}
+            for color_data in DEFAULT_COLORS:
+                name = color_data["name"]
+                new_hex = color_data["hex_code"]
+                if name in existing_colors:
+                    existing_colors[name].hex_code = new_hex
+                else:
+                    db_color = Color(name=name, hex_code=new_hex)
                     db.add(db_color)
-                await db.commit()
+            await db.commit()
         except Exception as e:
             print(f"Erro ao popular o banco: {e}")
             await db.rollback()
