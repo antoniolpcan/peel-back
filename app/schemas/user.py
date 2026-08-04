@@ -4,6 +4,7 @@ from datetime import datetime
 from app.schemas.media_files import MediaFileBase
 
 class BasicUserResponse(BaseModel):
+    id: int
     name: str
     username: Optional[str] = None
     bio: Optional[str] = None

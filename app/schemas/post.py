@@ -22,6 +22,7 @@ class PostResponse(PostBase):
     id: int
     user_id: int
     likes: int = 0
+    is_liked: bool = False
     created_at: Optional[datetime]
     color: Optional[ColorResponse] = None
     user: BasicUserResponse

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from typing import List
-from app.api.deps import get_post_service, get_comment_service, get_current_user 
+from app.api.deps import get_post_service, get_comment_service, get_current_user, get_current_user_optional
 from app.schemas.post import PostBase, PostResponse, PostUpdate, PostQueryParams
 from app.schemas.comments import CommentCreate, CommentResponse
 from app.services.posts import PostService
@@ -16,12 +16,17 @@ async def create_post(payload: PostBase,
     return await service.create_post(payload, user_id=current_user.id)
 
 @router.get("/{post_id}", response_model=PostResponse)
-async def get_post(post_id: int, service: PostService = Depends(get_post_service)):
-    return await service.get_post_by_id(post_id)
+async def get_post(post_id: int, service: PostService = Depends(get_post_service),
+                    current_user: User | None = Depends(get_current_user_optional)):
+    user_id = current_user.id if current_user else None
+    return await service.get_post_by_id(post_id, current_user_id=user_id)
 
 @router.get("", response_model=List[PostResponse])
-async def search_posts(params: PostQueryParams = Depends(), service: PostService = Depends(get_post_service)):
-    return await service.search_posts(params)
+async def search_posts( params: PostQueryParams = Depends(), 
+                        service: PostService = Depends(get_post_service),
+                        current_user: User | None = Depends(get_current_user_optional)):
+    user_id = current_user.id if current_user else None
+    return await service.search_posts(params, current_user_id=user_id)
 
 @router.post("/{post_id}", response_model=PostResponse)
 async def update_post(
@@ -44,7 +49,7 @@ async def delete_post(
 async def like_post(post_id: int, service: PostService = Depends(get_post_service),
         current_user: User = Depends(get_current_user)
     ):
-    return await service.toggle_post_like(current_user.id, post_id)
+    return await service.toggle_post_like(post_id, current_user.id)
 
 @router.post("/{post_id}/comments", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
 async def create_comment(post_id: int, content: str, service: CommentService = Depends(get_comment_service), current_user: User = Depends(get_current_user)):
