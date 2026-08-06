@@ -12,12 +12,15 @@ from app.models.users import User
 from app.repositories.users import UserRepository
 
 from app.services.auth import AuthService
+from app.services.chat import ChatService
 from app.services.colors import ColorService
 from app.services.comments import CommentService
 from app.services.follows import FollowService
+from app.services.notifications import NotificationService
 from app.services.posts import PostService
 from app.services.storage import StorageService
 from app.services.users import UserService
+from app.services.user_settings import UserSettingService
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as db:
@@ -79,3 +82,12 @@ def get_comment_service(db: AsyncSession = Depends(get_db)) -> CommentService:
 
 def get_follow_service(db: AsyncSession = Depends(get_db)) -> FollowService:
     return FollowService(db)
+
+def get_notification_service(db: AsyncSession = Depends(get_db)) -> NotificationService:
+    return NotificationService(db)
+
+def get_user_setting_service(db: AsyncSession = Depends(get_db)) -> UserSettingService:
+    return UserSettingService(db)
+
+def get_chat_service(db: AsyncSession = Depends(get_db)) -> ChatService:
+    return ChatService(db)

@@ -4,11 +4,15 @@ from app.repositories.posts import PostRepository
 from app.repositories.post_likes import PostLikeRepository
 from app.schemas.post import PostUpdate, PostCreate, PostQueryParams
 from app.models.posts import Post
+from app.services.notifications import NotificationService
+from app.schemas.notifications import NotificationCreate
+from app.models.notifications import NotificationType
 
 class PostService:
     def __init__(self, db: AsyncSession):
         self.post_repo = PostRepository(db)
         self.like_repo = PostLikeRepository(db)
+        self.notification_service = NotificationService(db)
 
     async def create_post(self, post_in: PostCreate, user_id: int) -> Post:
         post = await self.post_repo.create(post_in=post_in, user_id=user_id)
@@ -72,6 +76,13 @@ class PostService:
         else:
             await self.like_repo.create(user_id=user_id, post_id=post_id)
             await self.post_repo.increment_likes(post)
-            post.is_liked = True 
+            post.is_liked = True
 
+        if user_id != post.user_id:
+            notif_data = NotificationCreate(
+                user_id=post.user_id,
+                type=NotificationType.LIKE,
+                entity_id=post.id
+            )
+            await self.notification_service.create_notification(notif_data, actor_id=user_id)
         return post

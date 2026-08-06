@@ -3,11 +3,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.follows import FollowRepository
 from app.schemas.follows import FollowCreate
 from app.models.follows import Follow
+from app.services.notifications import NotificationService
+from app.schemas.notifications import NotificationCreate
+from app.models.notifications import NotificationType
 
 class FollowService:
 
     def __init__(self, db: AsyncSession):
         self.follower_repo = FollowRepository(db)
+        self.notification_service = NotificationService(db)
 
     async def follow_user(self, follower_id: int, follow_data: FollowCreate) -> Follow:
         if follower_id == follow_data.following_id:
@@ -26,6 +30,12 @@ class FollowService:
         new_follow = await self.follower_repo.create(follower_id, follow_data.following_id)
         await self.follower_repo.db.commit()
         await self.follower_repo.db.refresh(new_follow)
+        notif_data = NotificationCreate(
+            user_id=follow_data.following_id,
+            type=NotificationType.FOLLOW,
+            entity_id=follower_id
+        )
+        await self.notification_service.create_notification(notif_data, actor_id=follower_id)
         return new_follow
 
     async def unfollow_user(self, follower_id: int, following_id: int) -> None:

@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Peel API"
     DEBUG: bool = False
     API_V1_STR: str = "/api/v1"
+    ENVIRONMENT: str = "development"
     
     DATABASE_URL: str
 

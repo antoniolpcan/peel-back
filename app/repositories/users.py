@@ -19,6 +19,10 @@ class UserRepository:
         stmt = select(User).options(selectinload(User.avatar)).where(User.email == email)
         return await self.db.scalar(stmt)
 
+    async def get_by_username(self, username: str) -> User | None:
+        stmt = select(User).options(selectinload(User.avatar)).where(User.username == username)
+        return await self.db.scalar(stmt)
+
     async def get_all(self, skip: int = 0, limit: int = 100) -> list[User]:
         stmt = select(User).options(selectinload(User.avatar)).offset(skip).limit(limit)
         result = await self.db.scalars(stmt)
