@@ -52,3 +52,9 @@ class UserRepository:
     async def delete(self, db_user: User) -> None:
         await self.db.delete(db_user)
         await self.db.commit()
+
+    async def update_password(self, db_user: User, new_hashed_password: str) -> None:
+        db_user.hashed_password = new_hashed_password
+        self.db.add(db_user)
+        await self.db.commit()
+        await self.db.refresh(db_user)

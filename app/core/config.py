@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     ENVIRONMENT: str = "development"
     
+    APP_URL: str
     DATABASE_URL: str
 
     SECRET_KEY: str = Field(..., min_length=1)
@@ -16,6 +17,14 @@ class Settings(BaseSettings):
     CLOUD_NAME: str = Field(..., min_length=1)
     CLOUD_API_KEY: str = Field(..., min_length=1)
     CLOUD_API_SECRET: str = Field(..., min_length=1)
+
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: str
+    MAIL_PORT: int
+    MAIL_SERVER: str
+    MAIL_STARTTLS: bool
+    MAIL_SSL_TLS: bool
 
     @field_validator("DATABASE_URL")
     @classmethod
