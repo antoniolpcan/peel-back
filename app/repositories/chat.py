@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from app.models.chat import Chat, ChatMember, Message
@@ -91,3 +91,48 @@ class ChatRepository:
         )
         result = await self.db.scalars(stmt)
         return list(result.all())
+
+    async def get_unread_messages_summary(self, user_id: int) -> dict:
+        stmt = (
+            select(User, func.count(Message.id).label("unread_count"))
+            .join(Message, Message.sender_id == User.id)
+            .join(ChatMember, ChatMember.chat_id == Message.chat_id)
+            .where(
+                ChatMember.user_id == user_id,
+                Message.sender_id != user_id,
+                Message.is_read == False
+            )
+            .group_by(User.id)
+            .options(selectinload(User.avatar))
+        )
+        
+        result = await self.db.execute(stmt)
+        rows = result.all()
+
+        senders = [
+            {
+                "user": user,
+                "unread_count": unread_count
+            }
+            for user, unread_count in rows
+        ]
+        
+        total_unread = sum(item["unread_count"] for item in senders)
+
+        return {
+            "total_unread": total_unread,
+            "senders": senders
+        }
+
+    async def mark_messages_as_read(self, chat_id: int, user_id: int) -> None:
+        stmt = (
+            update(Message)
+            .where(
+                Message.chat_id == chat_id,
+                Message.sender_id != user_id,
+                Message.is_read == False
+            )
+            .values(is_read=True)
+        )
+        await self.db.execute(stmt)
+        await self.db.commit()

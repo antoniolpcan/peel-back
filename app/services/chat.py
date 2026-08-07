@@ -43,4 +43,8 @@ class ChatService:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Você não tem permissão para ler esta conversa."
             )
+        await self.chat_repo.mark_messages_as_read(chat_id=chat_id, user_id=user_id)
         return await self.chat_repo.get_messages(chat_id, skip, limit)
+
+    async def get_unread_messages_summary(self, user_id: int):
+        return await self.chat_repo.get_unread_messages_summary(user_id)

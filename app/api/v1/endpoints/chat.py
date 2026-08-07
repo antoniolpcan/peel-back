@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from typing import List
 from app.api.deps import get_current_user, get_chat_service
-from app.schemas.chat import ChatResponse, MessageCreate, MessageResponse
+from app.schemas.chat import ChatResponse, MessageCreate, MessageResponse, UnreadSummaryResponse
 from app.services.chat import ChatService
 from app.services.chat_ws_manager import chat_ws_manager
 from app.models.users import User
@@ -56,3 +56,10 @@ async def get_messages(
         service: ChatService = Depends(get_chat_service)
     ):
     return await service.get_chat_messages(chat_id, current_user.id, skip, limit)
+
+@router.get("/unread", response_model=UnreadSummaryResponse)
+async def get_unread_messages(
+        current_user: User = Depends(get_current_user),
+        service: ChatService = Depends(get_chat_service)
+    ):
+    return await service.get_unread_messages_summary(current_user.id)

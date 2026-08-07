@@ -29,3 +29,13 @@ class ChatResponse(BaseModel):
     members: List[ChatMemberResponse] = []
     
     model_config = ConfigDict(from_attributes=True)
+
+class UnreadSenderResponse(BaseModel):
+    user: BasicUserResponse
+    unread_count: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class UnreadSummaryResponse(BaseModel):
+    total_unread: int
+    senders: List[UnreadSenderResponse]
