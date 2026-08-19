@@ -2,7 +2,7 @@ from typing import AsyncGenerator
 import jwt
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 
 from app.core.config import settings
@@ -10,6 +10,7 @@ from app.core.database import SessionLocal
 from app.core.security import ALGORITHM, SECRET_KEY
 from app.models.users import User
 from app.repositories.users import UserRepository
+from app.repositories.token_blocklist import TokenBlocklistRepository
 
 from app.services.auth import AuthService
 from app.services.chat import ChatService
@@ -31,9 +32,24 @@ reusable_oauth2_optional = OAuth2PasswordBearer(
     auto_error=False,
 )
 
+async def get_token_hybrid(
+    request: Request,
+    header_token: str | None = Depends(reusable_oauth2_optional)
+) -> str | None:
+    if header_token:
+        return header_token
+    
+    token_with_prefix = request.cookies.get("access_token")
+    if token_with_prefix:
+        if token_with_prefix.startswith("Bearer "):
+            return token_with_prefix.split(" ")[1]
+        return token_with_prefix
+        
+    return None
+
 async def get_current_user_optional(
     db: AsyncSession = Depends(get_db),
-    token: str | None = Depends(reusable_oauth2_optional),
+    token: str | None = Depends(get_token_hybrid),
 ) -> User | None:
     
     if not token:
@@ -42,8 +58,15 @@ async def get_current_user_optional(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str | None = payload.get("sub")
-        if user_id is None:
+        jti: str | None = payload.get("jti")
+
+        if user_id is None or jti is None:
             return None
+
+        blocklist_repo = TokenBlocklistRepository(db)
+        if await blocklist_repo.is_blocked(jti):
+            return None
+            
     except (jwt.PyJWTError, ValidationError):
         return None
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends, BackgroundTasks, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.auth import Token, ForgotPasswordRequest, ResetPasswordRequest
 from app.services.auth import AuthService
@@ -8,9 +8,20 @@ router = APIRouter()
 
 @router.post("", response_model=Token)
 async def login_access_token(
+        response: Response,
         form_data: OAuth2PasswordRequestForm = Depends(),
-        service: AuthService = Depends(get_auth_service)):
-    return await service.acess_auth(form_data)
+        service: AuthService = Depends(get_auth_service)
+    ):
+    auth_data = await service.acess_auth(form_data)
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {auth_data['access_token']}",
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=1800
+    )
+    return auth_data
 
 @router.post("/forgot-password")
 async def forgot_password(
@@ -27,3 +38,13 @@ async def reset_password(
         service: AuthService = Depends(get_auth_service)
     ):
     return await service.reset_password(body.token, body.new_password)
+
+@router.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=True,
+        samesite="lax",
+    )
+    return {"message": "Logout realizado com sucesso"}

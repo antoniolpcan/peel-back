@@ -1,18 +1,24 @@
+import jwt
 import secrets
 import asyncio
 from datetime import datetime, timedelta, timezone
 from fastapi import BackgroundTasks, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.services.email import EmailService
 from app.repositories.users import UserRepository
 from app.repositories.password_reset import PasswordResetRepository
+from app.repositories.token_blocklist import TokenBlocklistRepository
 from app.core.security import verify_password, create_access_token, get_password_hash
+
+DUMMY_PASSWORD_HASH = "$2b$12$L7R2QhZ.nO.E3A.B9C8D7.E6F5G4H3I2J1K0L9M8N7O6P5Q4R3S"
 
 class AuthService:
     def __init__(self, db: AsyncSession):
         self.user_repo = UserRepository(db)
         self.reset_repo = PasswordResetRepository(db)
+        self.blocklist_repo = TokenBlocklistRepository(db)
 
     async def acess_auth(self, form_data):
         user = await self.user_repo.get_by_email(email=form_data.username)
@@ -21,6 +27,9 @@ class AuthService:
                 verify_password, form_data.password, user.hashed_password
             )
         else:
+            is_password_valid = await asyncio.to_thread(
+                verify_password, form_data.password, DUMMY_PASSWORD_HASH
+            )
             is_password_valid = False
         if not user or not is_password_valid:
             raise HTTPException(
@@ -83,3 +92,20 @@ class AuthService:
         await self.reset_repo.mark_as_used(db_token)
 
         return {"message": "Senha redefinida com sucesso!"}
+
+    async def logout(self, token: str | None) -> None:
+        if not token:
+            return
+
+        try:
+            secret = settings.SECRET_KEY.get_secret_value() if hasattr(settings.SECRET_KEY, "get_secret_value") else settings.SECRET_KEY
+            payload = jwt.decode(token, secret, algorithms=[settings.ALGORITHM])
+            jti = payload.get("jti")
+            exp = payload.get("exp")
+
+            if jti and exp:
+                expires_at = datetime.fromtimestamp(exp, tz=timezone.utc).replace(tzinfo=None)
+                await self.blocklist_repo.add(jti=jti, expires_at=expires_at)
+                
+        except jwt.PyJWTError:
+            pass

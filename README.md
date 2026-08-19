@@ -22,13 +22,13 @@ A estrutura e o relacionamento das tabelas do PostgreSQL foram mapeados no DrawS
 
 🔗 [Acessar versão interativa no DrawSQL](https://drawsql.app/teams/antonio-pereira/diagrams/peel/embed)
 
-![Diagrama do Banco de Dados](docs/diagram_v4.webp)
+![Diagrama do Banco de Dados](docs/diagram_v5.webp)
 
 ## 🔒 Variáveis de Ambiente
 
-O projeto utiliza o [**Cloudinary**](https://cloudinary.com/) para armazenamento de mídia e **JWT** para autenticação. Na raiz do projeto, você encontrará um arquivo chamado **.env.example**.
+O projeto utiliza o [**Cloudinary**](https://cloudinary.com/) para armazenamento de mídia, **PostgreSQL** para armazenamento de dados, envios de email via **SMTP** e **JWT** para autenticação. Na raiz do projeto, você encontrará um arquivo chamado **.env.example**, que obrigatoriamente deve ser preenchido para que esses serviços funcionem.
 
-Duplique esse arquivo, renomeie a cópia para **.env** e preencha com as suas credenciais locais e do Cloudinary (como **DATABASE_URL**, **chaves do Cloudinary** e a **SECRET_KEY**).
+Duplique esse arquivo, renomeie a cópia para **.env** e preencha com seus respectivos valores.
 
 ## 🛠️ Executando o projeto
 
