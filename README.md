@@ -1,4 +1,4 @@
-# 🌿 Peel (Back-end)
+# <img src="./docs/logo.png" width="150" height="150" alt="Logo" align="center" /> Peel (Back-end)
 
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
