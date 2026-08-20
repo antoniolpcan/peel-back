@@ -1,3 +1,4 @@
+import uuid
 from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,14 +18,14 @@ if TYPE_CHECKING:
 class User(Base):
     __tablename__ = "users"
     
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
     phone: Mapped[Optional[str]] = mapped_column(String(15), nullable=True)
     email: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     bio: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
-    avatar_id: Mapped[Optional[int]] = mapped_column(ForeignKey("media_files.id"), nullable=True)
+    avatar_id: Mapped[Optional[str]] = mapped_column(ForeignKey("media_files.id"), nullable=True)
     created_at: Mapped[Optional[datetime]] = mapped_column(default=func.now(), nullable=False)
     
     posts: Mapped[List["Post"]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)

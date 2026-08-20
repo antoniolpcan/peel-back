@@ -8,7 +8,7 @@ class ChatRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_direct_chat(self, user1_id: int, user2_id: int) -> Chat | None:
+    async def get_direct_chat(self, user1_id: str, user2_id: str) -> Chat | None:
         stmt = (
             select(Chat)
             .join(ChatMember, Chat.id == ChatMember.chat_id)
@@ -29,7 +29,7 @@ class ChatRepository:
                 return conv
         return None
 
-    async def create_direct_chat(self, user1_id: int, user2_id: int) -> Chat:
+    async def create_direct_chat(self, user1_id: str, user2_id: str) -> Chat:
         conv = Chat()
         self.db.add(conv)
         await self.db.flush()
@@ -51,7 +51,7 @@ class ChatRepository:
         )
         return await self.db.scalar(stmt)
 
-    async def get_user_chats(self, user_id: int) -> list[Chat]:
+    async def get_user_chats(self, user_id: str) -> list[Chat]:
         stmt = (
             select(Chat)
             .join(ChatMember)
@@ -66,7 +66,7 @@ class ChatRepository:
         result = await self.db.scalars(stmt)
         return list(result.all())
 
-    async def is_member(self, chat_id: int, user_id: int) -> bool:
+    async def is_member(self, chat_id: str, user_id: str) -> bool:
         stmt = select(ChatMember).where(
             ChatMember.chat_id == chat_id,
             ChatMember.user_id == user_id
@@ -74,14 +74,14 @@ class ChatRepository:
         result = await self.db.scalar(stmt)
         return result is not None
 
-    async def create_message(self, chat_id: int, sender_id: int, content: str) -> Message:
+    async def create_message(self, chat_id: str, sender_id: str, content: str) -> Message:
         msg = Message(chat_id=chat_id, sender_id=sender_id, content=content)
         self.db.add(msg)
         await self.db.commit()
         await self.db.refresh(msg)
         return msg
 
-    async def get_messages(self, chat_id: int, skip: int = 0, limit: int = 50) -> list[Message]:
+    async def get_messages(self, chat_id: str, skip: int = 0, limit: int = 50) -> list[Message]:
         stmt = (
             select(Message)
             .where(Message.chat_id == chat_id)
@@ -92,7 +92,7 @@ class ChatRepository:
         result = await self.db.scalars(stmt)
         return list(result.all())
 
-    async def get_unread_messages_summary(self, user_id: int) -> dict:
+    async def get_unread_messages_summary(self, user_id: str) -> dict:
         stmt = (
             select(User, func.count(Message.id).label("unread_count"))
             .join(Message, Message.sender_id == User.id)
@@ -124,7 +124,7 @@ class ChatRepository:
             "senders": senders
         }
 
-    async def mark_messages_as_read(self, chat_id: int, user_id: int) -> None:
+    async def mark_messages_as_read(self, chat_id: str, user_id: str) -> None:
         stmt = (
             update(Message)
             .where(

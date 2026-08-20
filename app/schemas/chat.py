@@ -7,9 +7,9 @@ class MessageCreate(BaseModel):
     content: str
 
 class MessageResponse(BaseModel):
-    id: int
-    chat_id: int
-    sender_id: int
+    id: str
+    chat_id: str
+    sender_id: str
     content: str
     is_read: bool
     created_at: datetime
@@ -17,14 +17,14 @@ class MessageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class ChatMemberResponse(BaseModel):
-    user_id: int
+    user_id: str
     joined_at: datetime
     user: Optional[BasicUserResponse] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 class ChatResponse(BaseModel):
-    id: int
+    id: str
     created_at: datetime
     members: List[ChatMemberResponse] = []
     

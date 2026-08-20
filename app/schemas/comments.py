@@ -6,12 +6,12 @@ class CommentBase(BaseModel):
     content: str
 
 class CommentCreate(CommentBase):
-    post_id: int
+    post_id: str
 
 class CommentResponse(CommentBase):
-    id: int
-    post_id: int
-    user_id: int
+    id: str
+    post_id: str
+    user_id: str
     user: BasicUserResponse
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)

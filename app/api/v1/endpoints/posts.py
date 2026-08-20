@@ -16,7 +16,7 @@ async def create_post(payload: PostBase,
     return await service.create_post(payload, user_id=current_user.id)
 
 @router.get("/{post_id}", response_model=PostResponse)
-async def get_post(post_id: int, service: PostService = Depends(get_post_service),
+async def get_post(post_id: str, service: PostService = Depends(get_post_service),
                     current_user: User | None = Depends(get_current_user_optional)):
     user_id = current_user.id if current_user else None
     return await service.get_post_by_id(post_id, current_user_id=user_id)
@@ -31,7 +31,7 @@ async def search_posts( params: PostQueryParams = Depends(),
 @router.post("/{post_id}", response_model=PostResponse)
 async def update_post(
         payload: PostUpdate, 
-        post_id: int, 
+        post_id: str, 
         service: PostService = Depends(get_post_service),
         current_user: User = Depends(get_current_user)
     ):
@@ -39,23 +39,23 @@ async def update_post(
     
 @router.delete("/{post_id}")
 async def delete_post(
-        post_id: int, 
+        post_id: str, 
         service: PostService = Depends(get_post_service),
         current_user: User = Depends(get_current_user)
     ):
     return await service.delete_post(post_id, user_id=current_user.id)
 
 @router.post("/{post_id}/like", response_model=PostResponse)
-async def like_post(post_id: int, service: PostService = Depends(get_post_service),
+async def like_post(post_id: str, service: PostService = Depends(get_post_service),
         current_user: User = Depends(get_current_user)
     ):
     return await service.toggle_post_like(post_id, current_user.id)
 
 @router.post("/{post_id}/comments", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
-async def create_comment(post_id: int, content: str, service: CommentService = Depends(get_comment_service), current_user: User = Depends(get_current_user)):
+async def create_comment(post_id: str, content: str, service: CommentService = Depends(get_comment_service), current_user: User = Depends(get_current_user)):
     payload = CommentCreate(content=content, post_id=post_id)
     return await service.create_comment(comment_in=payload, user_id=current_user.id)
 
 @router.get("/{post_id}/comments", response_model=list[CommentResponse])
-async def get_comments(post_id: int, service: CommentService = Depends(get_comment_service)):
+async def get_comments(post_id: str, service: CommentService = Depends(get_comment_service)):
     return await service.get_comments_for_post(post_id=post_id)

@@ -22,7 +22,7 @@ class UserService:
         if existing_username:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Este nome de usuário (username) já está em uso."
+                detail="Este nome de usuário já está em uso."
             )
         new_user = await self.user_repo.create(user_in=user_in)
         await self.setting_repo.create_default(user_id=new_user.id)
@@ -31,7 +31,7 @@ class UserService:
     async def get_users(self, skip: int = 0, limit: int = 100) -> list[User]:
         return await self.user_repo.get_all(skip=skip, limit=limit)
 
-    async def get_user(self, user_id: int) -> User:
+    async def get_user(self, user_id: str) -> User:
         user = await self.user_repo.get_by_id(user_id=user_id)
         if not user:
             raise HTTPException(
@@ -40,7 +40,7 @@ class UserService:
             )
         return user
 
-    async def update_user(self, user_id: int, user_in: UserUpdate) -> User:
+    async def update_user(self, user_id: str, user_in: UserUpdate) -> User:
         user = await self.get_user(user_id)
         if user_in.email and user_in.email != user.email:
             email_exists = await self.user_repo.get_by_email(email=user_in.email) 
@@ -58,7 +58,7 @@ class UserService:
                 )
         return await self.user_repo.update(db_user=user, user_in=user_in)
 
-    async def delete_user(self, user_id: int) -> None:
+    async def delete_user(self, user_id: str) -> None:
         user = await self.get_user(user_id)
         await self.user_repo.delete(db_user=user)
     

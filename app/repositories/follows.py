@@ -10,7 +10,7 @@ class FollowRepository:
     def __init__(self, db_session: AsyncSession):
         self.db = db_session
 
-    async def get_follow(self, follower_id: int, following_id: int) -> Follow | None:
+    async def get_follow(self, follower_id: str, following_id: str) -> Follow | None:
         query = select(Follow).where(
             Follow.follower_id == follower_id, 
             Follow.following_id == following_id
@@ -18,7 +18,7 @@ class FollowRepository:
         result = await self.db.execute(query)
         return result.scalars().first()
 
-    async def get_followers(self, user_id: int) -> list[Follow]:
+    async def get_followers(self, user_id: str) -> list[Follow]:
         query = (
             select(Follow)
             .options(
@@ -29,7 +29,7 @@ class FollowRepository:
         result = await self.db.execute(query)
         return result.scalars().unique().all()
 
-    async def get_following(self, user_id: int) -> list[Follow]:
+    async def get_following(self, user_id: str) -> list[Follow]:
         query = (
             select(Follow)
             .options(
@@ -40,7 +40,7 @@ class FollowRepository:
         result = await self.db.execute(query)
         return result.scalars().unique().all()
 
-    async def create(self, follower_id: int, following_id: int) -> Follow:
+    async def create(self, follower_id: str, following_id: str) -> Follow:
         new_follow = Follow(follower_id=follower_id, following_id=following_id)
         self.db.add(new_follow)
         return new_follow
@@ -48,7 +48,7 @@ class FollowRepository:
     async def delete(self, follow: Follow) -> None:
         await self.db.delete(follow)
 
-    async def get_follow_stats(self, user_id: int) -> dict:
+    async def get_follow_stats(self, user_id: str) -> dict:
         followers_query = select(func.count()).select_from(Follow).where(Follow.following_id == user_id)
         following_query = select(func.count()).select_from(Follow).where(Follow.follower_id == user_id)
         followers_result = await self.db.execute(followers_query)

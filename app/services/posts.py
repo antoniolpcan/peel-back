@@ -14,12 +14,12 @@ class PostService:
         self.like_repo = PostLikeRepository(db)
         self.notification_service = NotificationService(db)
 
-    async def create_post(self, post_in: PostCreate, user_id: int) -> Post:
+    async def create_post(self, post_in: PostCreate, user_id: str) -> Post:
         post = await self.post_repo.create(post_in=post_in, user_id=user_id)
         post.is_liked = False
         return post
 
-    async def get_post_by_id(self, post_id: int, current_user_id: int | None = None) -> Post:
+    async def get_post_by_id(self, post_id: str, current_user_id: str | None = None) -> Post:
         post = await self.post_repo.get_by_id(post_id=post_id)
         if not post:
             raise HTTPException(
@@ -34,7 +34,7 @@ class PostService:
 
         return post
 
-    async def search_posts(self, params: PostQueryParams, current_user_id: int | None = None) -> list[Post]:
+    async def search_posts(self, params: PostQueryParams, current_user_id: str | None = None) -> list[Post]:
         posts = await self.post_repo.search(**vars(params))
         if current_user_id and posts:
             post_ids = [p.id for p in posts]
@@ -47,7 +47,7 @@ class PostService:
 
         return posts
     
-    async def update_post(self, post_id: int, post_in: PostUpdate, user_id: int) -> Post:
+    async def update_post(self, post_id: str, post_in: PostUpdate, user_id: str) -> Post:
         post = await self.get_post_by_id(post_id=post_id, current_user_id=user_id)
         if post.user_id != user_id:
             raise HTTPException(
@@ -56,7 +56,7 @@ class PostService:
             )
         return await self.post_repo.update(db_obj=post, post_in=post_in)
 
-    async def delete_post(self, post_id: int, user_id: int) -> bool:
+    async def delete_post(self, post_id: str, user_id: str) -> bool:
         post = await self.get_post_by_id(post_id=post_id)
         if post.user_id != user_id:
             raise HTTPException(
@@ -65,7 +65,7 @@ class PostService:
             )
         return await self.post_repo.delete(db_obj=post)
 
-    async def toggle_post_like(self, post_id: int, user_id: int) -> Post:
+    async def toggle_post_like(self, post_id: str, user_id: str) -> Post:
         post = await self.get_post_by_id(post_id=post_id, current_user_id=user_id)
         existing_like = await self.like_repo.get_like(user_id=user_id, post_id=post_id)
         

@@ -9,7 +9,7 @@ class MediaFileCreate(MediaFileBase):
     pass
 
 class MediaFileResponse(MediaFileBase):
-    id: int
-    user_id: int
+    id: str
+    user_id: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)

@@ -9,7 +9,7 @@ class CommentRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_id(self, comment_id: int) -> Comment | None:
+    async def get_by_id(self, comment_id: str) -> Comment | None:
         stmt = (
             select(Comment)
             .options(selectinload(Comment.user).selectinload(User.avatar))
@@ -18,7 +18,7 @@ class CommentRepository:
         result = await self.db.execute(stmt)
         return result.scalars().first()
 
-    async def create(self, comment_in: CommentCreate, user_id: int) -> Comment:
+    async def create(self, comment_in: CommentCreate, user_id: str) -> Comment:
         db_comment = Comment(
             content=comment_in.content,
             post_id=comment_in.post_id,
@@ -29,7 +29,7 @@ class CommentRepository:
         await self.db.refresh(db_comment)
         return await self.get_by_id(db_comment.id)
 
-    async def get_by_post(self, post_id: int) -> list[Comment]:
+    async def get_by_post(self, post_id: str) -> list[Comment]:
         stmt = (
             select(Comment)
             .options(

@@ -15,7 +15,7 @@ class CommentService:
         self.comment_repo = CommentRepository(db)
         self.notification_service = NotificationService(db)
 
-    async def create_comment(self, comment_in: CommentCreate, user_id: int) -> Comment:
+    async def create_comment(self, comment_in: CommentCreate, user_id: str) -> Comment:
         post = await self.post_repo.get_by_id(post_id=comment_in.post_id)
         if not post:
             raise HTTPException(
@@ -32,7 +32,7 @@ class CommentService:
             await self.notification_service.create_notification(notif_data, actor_id=user_id)
         return comment
 
-    async def get_comments_for_post(self, post_id: int) -> list[Comment]:
+    async def get_comments_for_post(self, post_id: str) -> list[Comment]:
         post_exists = await self.post_repo.get_by_id(post_id=post_id)
         if not post_exists:
             raise HTTPException(

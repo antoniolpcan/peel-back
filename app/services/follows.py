@@ -13,7 +13,7 @@ class FollowService:
         self.follower_repo = FollowRepository(db)
         self.notification_service = NotificationService(db)
 
-    async def follow_user(self, follower_id: int, follow_data: FollowCreate) -> Follow:
+    async def follow_user(self, follower_id: str, follow_data: FollowCreate) -> Follow:
         if follower_id == follow_data.following_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -38,7 +38,7 @@ class FollowService:
         await self.notification_service.create_notification(notif_data, actor_id=follower_id)
         return new_follow
 
-    async def unfollow_user(self, follower_id: int, following_id: int) -> None:
+    async def unfollow_user(self, follower_id: str, following_id: str) -> None:
         follow = await self.follower_repo.get_follow(follower_id, following_id)
         if not follow:
             raise HTTPException(
@@ -49,11 +49,11 @@ class FollowService:
         await self.follower_repo.delete(follow)
         await self.follower_repo.db.commit()
 
-    async def get_followers(self, user_id: int) -> list[Follow]:
+    async def get_followers(self, user_id: str) -> list[Follow]:
         return await self.follower_repo.get_followers(user_id)
 
-    async def get_following(self, user_id: int) -> list[Follow]:
+    async def get_following(self, user_id: str) -> list[Follow]:
         return await self.follower_repo.get_following(user_id)
 
-    async def get_follow_stats(self, user_id: int) -> list[Follow]:
+    async def get_follow_stats(self, user_id: str) -> list[Follow]:
         return await self.follower_repo.get_follow_stats(user_id)

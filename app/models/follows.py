@@ -1,5 +1,6 @@
+import uuid
 from datetime import datetime
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import String, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 from typing import TYPE_CHECKING
@@ -10,9 +11,9 @@ if TYPE_CHECKING:
 class Follow(Base):
     __tablename__ = "follows"
     
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
-    follower_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    following_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    follower_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    following_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     
     follower: Mapped["User"] = relationship(back_populates="followers", foreign_keys=[follower_id])

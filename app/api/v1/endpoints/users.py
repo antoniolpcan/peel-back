@@ -17,7 +17,7 @@ async def read_users(skip: int = 0, limit: int = 100, service: UserService = Dep
     return await service.get_users(skip=skip, limit=limit)
 
 @router.get("/{user_id}", response_model=BasicUserResponse)
-async def get_user_profile(user_id: int, service: UserService = Depends(get_user_service)):
+async def get_user_profile(user_id: str, service: UserService = Depends(get_user_service)):
     return await service.get_user(user_id)
 
 @router.patch("/me", response_model=UserResponse)

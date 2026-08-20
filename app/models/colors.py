@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
@@ -8,7 +9,7 @@ if TYPE_CHECKING:
 
 class Color(Base):
     __tablename__ = "colors"
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     name: Mapped[str] = mapped_column(String(80), nullable=False, unique=True)
     hex_code: Mapped[str] = mapped_column(String(7), nullable=False)
     

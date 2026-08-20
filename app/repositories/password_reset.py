@@ -7,7 +7,7 @@ class PasswordResetRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create_token(self, user_id: int, token: str, expires_at: datetime) -> PasswordResetToken:
+    async def create_token(self, user_id: str, token: str, expires_at: datetime) -> PasswordResetToken:
         stmt = (
             update(PasswordResetToken)
             .where(PasswordResetToken.user_id == user_id, PasswordResetToken.used == False)

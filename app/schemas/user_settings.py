@@ -16,7 +16,7 @@ class UserSettingUpdate(BaseModel):
     push_notifications: Optional[bool] = None
 
 class UserSettingResponse(UserSettingBase):
-    id: int
-    user_id: int
+    id: str
+    user_id: str
     
     model_config = ConfigDict(from_attributes=True)

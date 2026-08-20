@@ -71,7 +71,7 @@ async def get_current_user_optional(
         return None
 
     user_repo = UserRepository(db)
-    return await user_repo.get_by_id(user_id=int(user_id))
+    return await user_repo.get_by_id(user_id=user_id)
 
 
 async def get_current_user(

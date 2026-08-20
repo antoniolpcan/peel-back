@@ -28,7 +28,7 @@ class StorageService:
         output.seek(0)
         return output
 
-    async def upload_and_save(self, file: UploadFile, user_id: int) -> dict:
+    async def upload_and_save(self, file: UploadFile, user_id: str) -> dict:
         try:
             otimized_image = await self._otimize(file)
             original_name, _ = os.path.splitext(file.filename)

@@ -11,7 +11,7 @@ class UserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_id(self, user_id: int) -> User | None:
+    async def get_by_id(self, user_id: str) -> User | None:
         stmt = select(User).options(selectinload(User.avatar)).where(User.id == user_id)
         return await self.db.scalar(stmt)
 

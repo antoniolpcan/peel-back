@@ -6,7 +6,7 @@ class MediaRepository:
     def __init__(self, db_session: AsyncSession):
         self.db = db_session
 
-    async def save(self, filename: str, user_id: int, url: str) -> MediaFile:
+    async def save(self, filename: str, user_id: str, url: str) -> MediaFile:
         new_file = MediaFile(filename=filename, user_id=user_id,url=url)
         self.db.add(new_file)
         await self.db.commit()

@@ -8,14 +8,14 @@ class NotificationRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, data: NotificationCreate, actor_id: int) -> Notification:
+    async def create(self, data: NotificationCreate, actor_id: str) -> Notification:
         db_notification = Notification(**data.model_dump(), actor_id=actor_id)
         self.session.add(db_notification)
         await self.session.commit()
         await self.session.refresh(db_notification)
         return db_notification
 
-    async def get_by_user_id(self, user_id: int, skip: int, limit: int) -> Sequence[Notification]:
+    async def get_by_user_id(self, user_id: str, skip: int, limit: int) -> Sequence[Notification]:
         stmt = (
             select(Notification)
             .where(Notification.user_id == user_id)
@@ -26,7 +26,7 @@ class NotificationRepository:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def mark_as_read(self, notification_id: int, user_id: int) -> Notification | None:
+    async def mark_as_read(self, notification_id: str, user_id: str) -> Notification | None:
         stmt = (
             update(Notification)
             .where(Notification.id == notification_id, Notification.user_id == user_id)

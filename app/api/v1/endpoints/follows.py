@@ -17,7 +17,7 @@ async def follow_user(
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def unfollow_user(
-        user_id: int,
+        user_id: str,
         current_user: User = Depends(get_current_user),
         service: FollowService = Depends(get_follow_service)
     ):
@@ -25,21 +25,21 @@ async def unfollow_user(
 
 @router.get("/followers/{user_id}", response_model=List[FollowerResponse])
 async def get_followers(
-        user_id: int,
+        user_id: str,
         service: FollowService = Depends(get_follow_service)
     ):
     return await service.get_followers(user_id)
 
 @router.get("/following/{user_id}", response_model=List[FollowingResponse])
 async def get_following(
-        user_id: int,
+        user_id: str,
         service: FollowService = Depends(get_follow_service)
     ):
     return await service.get_following(user_id)
 
 @router.get("/{user_id}/stats", response_model=FollowStatsResponse)
 async def get_user_follow_stats(
-        user_id: int,
+        user_id: str,
         service: FollowService = Depends(get_follow_service)
     ):
     return await service.get_follow_stats(user_id)

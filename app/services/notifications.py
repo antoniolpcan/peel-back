@@ -10,13 +10,13 @@ class NotificationService:
     def __init__(self, session: AsyncSession):
         self.repository = NotificationRepository(session)
 
-    async def create_notification(self, data: NotificationCreate, actor_id: int) -> Notification:
+    async def create_notification(self, data: NotificationCreate, actor_id: str) -> Notification:
         return await self.repository.create(data, actor_id)
 
-    async def get_user_notifications(self, user_id: int, skip: int, limit: int) -> Sequence[Notification]:
+    async def get_user_notifications(self, user_id: str, skip: int, limit: int) -> Sequence[Notification]:
         return await self.repository.get_by_user_id(user_id, skip, limit)
 
-    async def read_notification(self, notification_id: int, user_id: int) -> Notification:
+    async def read_notification(self, notification_id: str, user_id: str) -> Notification:
         notification = await self.repository.mark_as_read(notification_id, user_id)
         if not notification:
             raise HTTPException(

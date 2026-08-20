@@ -5,7 +5,7 @@ from datetime import datetime
 from app.schemas.media_files import MediaFileBase
 
 class BasicUserResponse(BaseModel):
-    id: int
+    id: str
     name: str
     username: str
     bio: Optional[str] = None
@@ -38,7 +38,7 @@ class UserCreate(UserBase):
         return v
 
 class UserResponse(UserBase):
-    id: int
+    id: str
     avatar: Optional[MediaFileBase] = None
     created_at: Optional[datetime]
     
@@ -50,4 +50,4 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     bio: Optional[str] = None
-    avatar_id: Optional[int] = None
+    avatar_id: Optional[str] = None

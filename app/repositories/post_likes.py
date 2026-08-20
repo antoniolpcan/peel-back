@@ -6,12 +6,12 @@ class PostLikeRepository:
     def __init__(self, db_session: AsyncSession):
         self.db = db_session
 
-    async def get_like(self, user_id: int, post_id: int) -> PostLike | None:
+    async def get_like(self, user_id: str, post_id: str) -> PostLike | None:
         query = select(PostLike).where(PostLike.user_id == user_id, PostLike.post_id == post_id)
         result = await self.db.execute(query)
         return result.scalars().first()
 
-    async def create(self, user_id: int, post_id: int) -> PostLike:
+    async def create(self, user_id: str, post_id: str) -> PostLike:
         new_like = PostLike(user_id=user_id, post_id=post_id)
         self.db.add(new_like)
         return new_like
@@ -19,7 +19,7 @@ class PostLikeRepository:
     async def delete(self, like: PostLike) -> None:
         await self.db.delete(like)
 
-    async def is_liked_by_user(self, post_id: int, user_id: int) -> bool:
+    async def is_liked_by_user(self, post_id: str, user_id: str) -> bool:
         stmt = (
             select(PostLike.id)
             .where(
@@ -31,7 +31,7 @@ class PostLikeRepository:
         result = await self.db.scalar(stmt)
         return result is not None
 
-    async def get_user_liked_post_ids(self, user_id: int, post_ids: list[int]) -> set[int]:
+    async def get_user_liked_post_ids(self, user_id: str, post_ids: list[int]) -> set[int]:
         stmt = select(PostLike.post_id).where(
             PostLike.user_id == user_id,
             PostLike.post_id.in_(post_ids)

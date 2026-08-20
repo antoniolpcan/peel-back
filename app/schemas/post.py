@@ -8,7 +8,7 @@ from app.schemas.user import BasicUserResponse
 class PostBase(BaseModel):
     title: str
     body: str
-    color_id: Optional[int] = None
+    color_id: Optional[str] = None
 
 class PostCreate(PostBase):
     pass
@@ -16,11 +16,11 @@ class PostCreate(PostBase):
 class PostUpdate(BaseModel):
     title: Optional[str] = None
     body: Optional[str] = None
-    color_id: Optional[int] = None
+    color_id: Optional[str] = None
 
 class PostResponse(PostBase):
-    id: int
-    user_id: int
+    id: str
+    user_id: str
     likes: int = 0
     is_liked: bool = False
     created_at: Optional[datetime]
@@ -35,8 +35,8 @@ class PostQueryParams:
         limit: int = 100,
         title: Optional[str] = None,
         body: Optional[str] = None,
-        user_id: Optional[int] = None,
-        following_for_user_id: Optional[int] = None,
+        user_id: Optional[str] = None,
+        following_for_user_id: Optional[str] = None,
         order_by: PostSortField = PostSortField.created_at,
         sort_order: SortOrder = SortOrder.desc
     ):

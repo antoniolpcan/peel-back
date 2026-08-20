@@ -5,7 +5,6 @@ class SortOrder(str, Enum):
     desc = "desc"
 
 class PostSortField(str, Enum):
-    id = "id"
     title = "title"
     likes = "likes"
     created_at = "created_at"

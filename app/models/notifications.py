@@ -1,6 +1,7 @@
+import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import ForeignKey, func, Enum
+from sqlalchemy import String, ForeignKey, func, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 import enum
@@ -16,12 +17,12 @@ class NotificationType(str, enum.Enum):
 class Notification(Base):
     __tablename__ = "notifications"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, nullable=False, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    actor_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
     type: Mapped[NotificationType] = mapped_column(Enum(NotificationType), nullable=False)
-    entity_id: Mapped[Optional[int]] = mapped_column(nullable=True)
+    entity_id: Mapped[Optional[str]] = mapped_column(nullable=True)
     is_read: Mapped[bool] = mapped_column(default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
 

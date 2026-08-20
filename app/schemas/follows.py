@@ -2,19 +2,19 @@ from pydantic import BaseModel, ConfigDict
 from app.schemas.user import BasicUserResponse
 
 class FollowCreate(BaseModel):
-    following_id: int
+    following_id: str
 
 class FollowerResponse(BaseModel):
-    id: int
-    follower_id: int
-    following_id: int
+    id: str
+    follower_id: str
+    following_id: str
     follower: BasicUserResponse | None = None
     model_config = ConfigDict(from_attributes=True)
 
 class FollowingResponse(BaseModel):
-    id: int
-    follower_id: int
-    following_id: int
+    id: str
+    follower_id: str
+    following_id: str
     following: BasicUserResponse | None = None
     model_config = ConfigDict(from_attributes=True)
 

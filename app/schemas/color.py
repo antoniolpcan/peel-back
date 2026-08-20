@@ -8,5 +8,5 @@ class ColorCreate(ColorBase):
     pass
 
 class ColorResponse(ColorBase):
-    id: int
+    id: str
     model_config = ConfigDict(from_attributes=True)

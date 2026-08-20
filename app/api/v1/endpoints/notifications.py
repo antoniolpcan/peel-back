@@ -12,7 +12,7 @@ router = APIRouter()
 @router.websocket("/ws/{user_id}")
 async def websocket_notifications_endpoint(
         websocket: WebSocket,
-        user_id: int
+        user_id: str
     ):
     await notification_ws_manager.connect(websocket, user_id)
     try:
@@ -47,7 +47,7 @@ async def list_notifications(
 
 @router.patch("/{notification_id}/read", response_model=NotificationResponse)
 async def mark_as_read(
-        notification_id: int,
+        notification_id: str,
         current_user: User = Depends(get_current_user),
         service: NotificationService = Depends(get_notification_service)
     ):

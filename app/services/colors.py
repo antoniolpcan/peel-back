@@ -17,7 +17,7 @@ class ColorService:
             )
         return await self.color_repo.create(color_in)
 
-    async def get_color(self, color_id: int) -> Color | None:
+    async def get_color(self, color_id: str) -> Color | None:
         color = await self.color_repo.get_by_id(color_id)
         if not color:
             raise HTTPException(

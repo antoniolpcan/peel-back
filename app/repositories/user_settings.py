@@ -7,11 +7,11 @@ class UserSettingRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_user_id(self, user_id: int) -> UserSetting | None:
+    async def get_by_user_id(self, user_id: str) -> UserSetting | None:
         stmt = select(UserSetting).where(UserSetting.user_id == user_id)
         return await self.db.scalar(stmt)
 
-    async def create_default(self, user_id: int) -> UserSetting:
+    async def create_default(self, user_id: str) -> UserSetting:
         db_setting = UserSetting(user_id=user_id)
         self.db.add(db_setting)
         await self.db.commit()

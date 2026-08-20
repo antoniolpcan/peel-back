@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.post("/direct/{target_user_id}", response_model=ChatResponse)
 async def start_direct_chat(
-        target_user_id: int,
+        target_user_id: str,
         current_user: User = Depends(get_current_user),
         service: ChatService = Depends(get_chat_service)
     ):
@@ -26,7 +26,7 @@ async def list_my_chats(
 @router.websocket("/ws/{chat_id}")
 async def websocket_chat_endpoint(
         websocket: WebSocket,
-        chat_id: int
+        chat_id: str
     ):
     await chat_ws_manager.connect(websocket, chat_id)
     try:
@@ -37,7 +37,7 @@ async def websocket_chat_endpoint(
 
 @router.post("/{chat_id}/messages", response_model=MessageResponse)
 async def send_message(
-        chat_id: int,
+        chat_id: str,
         message_in: MessageCreate,
         current_user: User = Depends(get_current_user),
         service: ChatService = Depends(get_chat_service)
@@ -49,7 +49,7 @@ async def send_message(
 
 @router.get("/{chat_id}/messages", response_model=List[MessageResponse])
 async def get_messages(
-        chat_id: int,
+        chat_id: str,
         skip: int = 0,
         limit: int = 50,
         current_user: User = Depends(get_current_user),

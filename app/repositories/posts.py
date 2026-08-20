@@ -12,7 +12,7 @@ class PostRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_id(self, post_id: int) -> Post | None:
+    async def get_by_id(self, post_id: str) -> Post | None:
         stmt = (
             select(Post)
             .options(
@@ -42,8 +42,8 @@ class PostRepository:
         limit: int = 100,
         title: str | None = None,
         body: str | None = None,
-        user_id: int | None = None,
-        following_for_user_id: int | None = None,
+        user_id: str | None = None,
+        following_for_user_id: str | None = None,
         order_by: PostSortField = PostSortField.created_at,
         sort_order: SortOrder = SortOrder.desc
     ) -> list[Post]:
@@ -76,7 +76,7 @@ class PostRepository:
         result = await self.db.scalars(stmt)
         return list(result.all())
     
-    async def create(self, post_in: Post, user_id: int) -> Post:
+    async def create(self, post_in: Post, user_id: str) -> Post:
         db_obj = Post(
             title=post_in.title,
             body=post_in.body,

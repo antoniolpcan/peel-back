@@ -1,4 +1,5 @@
 import jwt
+import random
 import secrets
 import asyncio
 from datetime import datetime, timedelta, timezone
@@ -6,6 +7,7 @@ from fastapi import BackgroundTasks, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.schemas.auth import UserRegisterRequest
 from app.services.email import EmailService
 from app.repositories.users import UserRepository
 from app.repositories.password_reset import PasswordResetRepository

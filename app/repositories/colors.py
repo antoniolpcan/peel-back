@@ -7,7 +7,7 @@ class ColorRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_id(self, color_id: int) -> Color | None:
+    async def get_by_id(self, color_id: str) -> Color | None:
         return await self.db.scalar(select(Color).where(Color.id == color_id))
     
     async def get_by_name(self, color_name: str) -> Color | None:
