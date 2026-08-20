@@ -22,7 +22,7 @@ A estrutura e o relacionamento das tabelas do PostgreSQL foram mapeados no DrawS
 
 🔗 [Acessar versão interativa no DrawSQL](https://drawsql.app/teams/antonio-pereira/diagrams/peel/embed)
 
-![Diagrama do Banco de Dados](docs/diagram_v5.webp)
+![Diagrama do Banco de Dados](docs/diagram_v6.webp)
 
 ## 🔒 Variáveis de Ambiente
 
