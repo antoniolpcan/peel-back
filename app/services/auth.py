@@ -7,7 +7,6 @@ from fastapi import BackgroundTasks, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.schemas.auth import UserRegisterRequest
 from app.services.email import EmailService
 from app.repositories.users import UserRepository
 from app.repositories.password_reset import PasswordResetRepository
