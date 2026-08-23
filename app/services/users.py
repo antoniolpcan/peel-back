@@ -3,15 +3,34 @@ from fastapi import HTTPException, status
 
 from app.repositories.user_settings import UserSettingRepository
 from app.repositories.users import UserRepository
+from app.repositories.token import TokenRepository
 from app.schemas.user import UserCreate, UserUpdate
 from app.models.users import User
+
+from datetime import datetime, timezone
 
 class UserService:
     def __init__(self, db: AsyncSession):
         self.user_repo = UserRepository(db)
         self.setting_repo = UserSettingRepository(db)
+        self.token_repo = TokenRepository(db)
 
     async def create_user(self, user_in: UserCreate) -> User:
+        db_code = await self.token_repo.get_by_email_and_token(
+            email=user_in.email, 
+            token_str=user_in.verification_token
+        )
+        if not db_code or db_code.used:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Código de verificação inválido ou já utilizado."
+            )
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        if db_code.expires_at < now:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="O código de verificação expirou. Solicite um novo."
+            )
         existing_user = await self.user_repo.get_by_email(email=user_in.email)
         if existing_user:
             raise HTTPException(
@@ -24,6 +43,7 @@ class UserService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Este nome de usuário já está em uso."
             )
+        await self.token_repo.mark_as_used(db_code)
         new_user = await self.user_repo.create(user_in=user_in)
         await self.setting_repo.create_default(user_id=new_user.id)
         return new_user

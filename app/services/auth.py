@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.services.email import EmailService
 from app.repositories.users import UserRepository
-from app.repositories.password_reset import PasswordResetRepository
+from app.repositories.token import TokenRepository
 from app.repositories.token_blocklist import TokenBlocklistRepository
 from app.core.security import verify_password, create_access_token, get_password_hash
 
@@ -18,7 +18,7 @@ DUMMY_PASSWORD_HASH = "$2b$12$L7R2QhZ.nO.E3A.B9C8D7.E6F5G4H3I2J1K0L9M8N7O6P5Q4R3
 class AuthService:
     def __init__(self, db: AsyncSession):
         self.user_repo = UserRepository(db)
-        self.reset_repo = PasswordResetRepository(db)
+        self.token_repo = TokenRepository(db)
         self.blocklist_repo = TokenBlocklistRepository(db)
 
     async def acess_auth(self, form_data):
@@ -43,6 +43,44 @@ class AuthService:
             "token_type": "bearer",
         }
 
+    async def request_email_verify(self, email: str, background_tasks: BackgroundTasks) -> dict:
+        existing_user = await self.user_repo.get_by_email(email)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="E-mail já cadastrado no sistema."
+            )
+        
+        code = f"{secrets.randbelow(1000000):06d}"
+
+        expires_at = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(minutes=10)
+
+        await self.token_repo.create_token(
+            email=email,
+            token=code,
+            expires_at=expires_at
+        )
+
+        background_tasks.add_task(EmailService.send_registry_token, email, code)
+
+        return {"message": "Código de verificação enviado para o seu e-mail."}
+
+    async def verify_email_code(self, email: str, code: str) -> dict:
+        db_code = await self.token_repo.get_by_email_and_token(email, code)
+        if not db_code or db_code.used:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Código inválido ou já utilizado."
+            )
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        if db_code.expires_at < now:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="O código expirou. Solicite um novo."
+            )
+        await self.token_repo.mark_as_used(db_code)
+        return {"message": "E-mail verificado com sucesso!"}
+    
     async def request_password_reset(self, email: str, background_tasks: BackgroundTasks) -> dict:
         user = await self.user_repo.get_by_email(email)
 
@@ -53,7 +91,7 @@ class AuthService:
         token = secrets.token_urlsafe(32)
         expires_at = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(minutes=15)
 
-        await self.reset_repo.create_token(
+        await self.token_repo.create_token(
             user_id=user.id,
             token=token,
             expires_at=expires_at
@@ -63,7 +101,7 @@ class AuthService:
         return generic_message
 
     async def reset_password(self, token_str: str, new_password: str) -> dict:
-        db_token = await self.reset_repo.get_by_token(token_str)
+        db_token = await self.token_repo.get_by_token(token_str)
 
         if not db_token or db_token.used:
             raise HTTPException(
@@ -90,7 +128,7 @@ class AuthService:
         new_hashed_password = await asyncio.to_thread(get_password_hash, new_password)
         
         await self.user_repo.update_password(user, new_hashed_password)
-        await self.reset_repo.mark_as_used(db_token)
+        await self.token_repo.mark_as_used(db_token)
 
         return {"message": "Senha redefinida com sucesso!"}
 

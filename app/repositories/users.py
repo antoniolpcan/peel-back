@@ -30,6 +30,7 @@ class UserRepository:
 
     async def create(self, user_in: UserCreate) -> User:
         user_data = user_in.model_dump()
+        user_data.pop("verification_token")
         password = user_data.pop("password")
         user_data["hashed_password"] = await asyncio.to_thread(get_password_hash, password)
         

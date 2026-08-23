@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, BackgroundTasks, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from app.schemas.auth import Token, ForgotPasswordRequest, ResetPasswordRequest
+from app.schemas.auth import Token, ForgotPasswordRequest, ResetPasswordRequest, VerifyCodeRequest
 from app.services.auth import AuthService
 from app.api.deps import get_auth_service
 
@@ -22,6 +22,21 @@ async def login_access_token(
         max_age=1800
     )
     return auth_data
+
+@router.post("/send-mail-verification")
+async def send_mail_verify(
+        body: ForgotPasswordRequest,
+        background_tasks: BackgroundTasks,
+        service: AuthService = Depends(get_auth_service)
+    ):
+    return await service.request_email_verify(body.email, background_tasks)
+
+@router.post("/verify-code")
+async def verify_code(
+        body: VerifyCodeRequest,
+        service: AuthService = Depends(get_auth_service)
+    ):
+    return await service.verify_email_code(body.email, body.code)
 
 @router.post("/forgot-password")
 async def forgot_password(

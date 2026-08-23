@@ -21,6 +21,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., description="Senha forte para adequação à LGPD")
+    verification_token: str
 
     @field_validator('password')
     @classmethod

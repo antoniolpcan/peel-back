@@ -11,6 +11,10 @@ class Token(BaseModel):
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
+    
+class VerifyCodeRequest(BaseModel):
+    email: EmailStr
+    code: str
 
 class ResetPasswordRequest(BaseModel):
     token: str
