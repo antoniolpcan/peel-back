@@ -2,7 +2,7 @@ from typing import AsyncGenerator
 import jwt
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, status, Request, WebSocket, WebSocketException
 from fastapi.security import OAuth2PasswordBearer
 
 from app.core.config import settings
@@ -47,20 +47,24 @@ async def get_token_hybrid(
         
     return None
 
-async def get_current_user_optional(
-    db: AsyncSession = Depends(get_db),
-    token: str | None = Depends(get_token_hybrid),
+async def get_user_from_token(
+    db: AsyncSession,
+    token: str | None,
 ) -> User | None:
     
     if not token:
         return None
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token,
+            SECRET_KEY, algorithms=[ALGORITHM],
+        )
+
         user_id: str | None = payload.get("sub")
         jti: str | None = payload.get("jti")
 
-        if user_id is None or jti is None:
+        if not user_id or not jti:
             return None
 
         blocklist_repo = TokenBlocklistRepository(db)
@@ -73,6 +77,29 @@ async def get_current_user_optional(
     user_repo = UserRepository(db)
     return await user_repo.get_by_id(user_id=user_id)
 
+async def get_current_user_optional(
+    db: AsyncSession = Depends(get_db),
+    token: str | None = Depends(get_token_hybrid),
+) -> User | None:
+    return await get_user_from_token(db, token)
+
+async def get_websocket_user(
+    websocket: WebSocket,
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    token = websocket.cookies.get("access_token")
+    if token and token.startswith("Bearer "):
+        token = token.removeprefix("Bearer ")
+    user = await get_user_from_token(
+        db=db,
+        token=token,
+    )
+    if not user:
+        raise WebSocketException(
+            code=status.WS_1008_POLICY_VIOLATION,
+            reason="Não autenticado",
+        )
+    return user
 
 async def get_current_user(
     current_user: User | None = Depends(get_current_user_optional),

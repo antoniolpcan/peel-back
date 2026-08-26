@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.auth import Token, ForgotPasswordRequest, ResetPasswordRequest, VerifyCodeRequest
 from app.services.auth import AuthService
-from app.api.deps import get_auth_service
+from app.api.deps import get_auth_service, get_token_hybrid
 
 router = APIRouter()
 
@@ -55,7 +55,12 @@ async def reset_password(
     return await service.reset_password(body.token, body.new_password)
 
 @router.post("/logout")
-async def logout(response: Response):
+async def logout(
+        response: Response,
+        token: str | None = Depends(get_token_hybrid),
+        service: AuthService = Depends(get_auth_service),
+    ):
+    await service.logout(token)
     response.delete_cookie(
         key="access_token",
         httponly=True,

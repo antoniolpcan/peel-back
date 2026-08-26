@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from typing import List
-from app.api.deps import get_current_user, get_chat_service
+from app.api.deps import get_current_user, get_chat_service, get_websocket_user
 from app.schemas.chat import ChatResponse, MessageCreate, MessageResponse, UnreadSummaryResponse
 from app.services.chat import ChatService
 from app.services.chat_ws_manager import chat_ws_manager
@@ -26,7 +26,8 @@ async def list_my_chats(
 @router.websocket("/ws/{chat_id}")
 async def websocket_chat_endpoint(
         websocket: WebSocket,
-        chat_id: str
+        chat_id: str,
+        current_user: User = Depends(get_websocket_user)
     ):
     await chat_ws_manager.connect(websocket, chat_id)
     try:

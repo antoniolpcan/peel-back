@@ -20,6 +20,10 @@ async def read_users(skip: int = 0, limit: int = 100, service: UserService = Dep
 async def get_user_profile(user_id: str, service: UserService = Depends(get_user_service)):
     return await service.get_user(user_id)
 
+@router.get("/me/logged", response_model=BasicUserResponse)
+async def get_me(service: UserService = Depends(get_user_service), current_user: User = Depends(get_current_user)):
+    return await service.get_user(current_user.id)
+
 @router.patch("/me", response_model=UserResponse)
 async def update_current_user(payload: UserUpdate, service: UserService = Depends(get_user_service),
                         current_user: User = Depends(get_current_user)):

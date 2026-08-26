@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from typing import List
 
-from app.api.deps import get_notification_service, get_current_user 
+from app.api.deps import get_notification_service, get_current_user, get_websocket_user
 from app.schemas.notifications import NotificationResponse, NotificationCreate
 from app.services.notifications import NotificationService
 from app.services.notification_ws_manager import notification_ws_manager
@@ -9,17 +9,17 @@ from app.models.users import User
 
 router = APIRouter()
 
-@router.websocket("/ws/{user_id}")
+@router.websocket("/ws")
 async def websocket_notifications_endpoint(
         websocket: WebSocket,
-        user_id: str
+        current_user: User = Depends(get_websocket_user)
     ):
-    await notification_ws_manager.connect(websocket, user_id)
+    await notification_ws_manager.connect(websocket, current_user.id)
     try:
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
-        notification_ws_manager.disconnect(user_id)
+        notification_ws_manager.disconnect(current_user.id)
 
 @router.post("/", response_model=NotificationResponse)
 async def create_notification(
