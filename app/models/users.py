@@ -1,9 +1,8 @@
 import uuid
 from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import String, ForeignKey, func
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.core.database import Base
-from datetime import datetime
+from app.core.database import Base, Timestamp
 
 if TYPE_CHECKING:
     from app.models.posts import Post
@@ -26,7 +25,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     bio: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     avatar_id: Mapped[Optional[str]] = mapped_column(ForeignKey("media_files.id"), nullable=True)
-    created_at: Mapped[Optional[datetime]] = mapped_column(default=func.now(), nullable=False)
+    created_at: Mapped[Timestamp]
     
     posts: Mapped[List["Post"]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
     comments: Mapped[List["Comment"]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)

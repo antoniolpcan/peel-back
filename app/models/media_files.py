@@ -1,8 +1,7 @@
 import uuid
-from datetime import datetime
-from sqlalchemy import String, ForeignKey, func
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.core.database import Base
+from app.core.database import Base, Timestamp
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -15,7 +14,7 @@ class MediaFile(Base):
     filename: Mapped[str] = mapped_column(String(255), nullable=False)
     url: Mapped[str] = mapped_column(String(500), nullable=False)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
+    created_at: Mapped[Timestamp]
     
     user: Mapped["User"] = relationship(back_populates="media_files", foreign_keys=[user_id])
 

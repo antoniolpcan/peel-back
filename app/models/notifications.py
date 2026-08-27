@@ -1,9 +1,8 @@
 import uuid
-from datetime import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import String, ForeignKey, func, Enum
+from sqlalchemy import String, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.core.database import Base
+from app.core.database import Base, Timestamp
 import enum
 
 if TYPE_CHECKING:
@@ -24,7 +23,7 @@ class Notification(Base):
     type: Mapped[NotificationType] = mapped_column(Enum(NotificationType), nullable=False)
     entity_id: Mapped[Optional[str]] = mapped_column(nullable=True)
     is_read: Mapped[bool] = mapped_column(default=False, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
+    created_at: Mapped[Timestamp]
 
     user: Mapped["User"] = relationship("User", foreign_keys=[user_id], back_populates="notifications")
     

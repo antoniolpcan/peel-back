@@ -1,9 +1,8 @@
 import uuid
-from datetime import datetime
 from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import String, ForeignKey, func
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.core.database import Base
+from app.core.database import Base, Timestamp
 
 if TYPE_CHECKING:
     from app.models.users import User
@@ -20,7 +19,7 @@ class Post(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     color_id: Mapped[Optional[str]] = mapped_column(ForeignKey("colors.id"), nullable=True)
     likes: Mapped[int] = mapped_column(default=0, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
+    created_at: Mapped[Timestamp]
 
     user: Mapped["User"] = relationship(back_populates="posts")
     color: Mapped[Optional["Color"]] = relationship(back_populates="posts")
