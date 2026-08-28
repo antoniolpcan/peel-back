@@ -26,7 +26,7 @@ class UserService:
                 detail="Código de verificação inválido ou já utilizado."
             )
         now = datetime.now(timezone.utc).replace(tzinfo=None)
-        if db_code.expires_at < now:
+        if db_code.expires_at.replace(tzinfo=None) < now:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="O código de verificação expirou. Solicite um novo."
